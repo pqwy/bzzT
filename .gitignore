@@ -1,7 +1,5 @@
-
-/project
-/target
-/lib_managed
-/src_managed
+target/
+lib_managed/
+src_managed/
 
 
