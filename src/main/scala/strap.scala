@@ -1,4 +1,4 @@
-package xxx.desu.bzzloader
+package xxx.desu.bzzt
 
 import akka.actor._
 import akka.pattern.ask
@@ -37,10 +37,10 @@ object StandAlones {
 
   def mkMsg = {
 
-    import xxx.desu.bzzloader.JarIO
+    import xxx.desu.bzzt.JarIO
 
     val (klazz, file) =
-      ( "desu.RondoHog", "/home/self/coad/projects/bzzloader/hosted/wat.jar" )
+      ( "desu.RondoHog", "/home/self/coad/projects/bzzT/hosted/wat.jar" )
 
     val blob = JarIO.slurp (new java.io.FileInputStream (file))
     println ("ok, loaded file.")

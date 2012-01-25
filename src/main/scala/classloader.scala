@@ -1,4 +1,4 @@
-package xxx.desu.bzzloader
+package xxx.desu.bzzt
 
 import scala.collection.mutable.ArrayBuffer
 import scala.util.regexp._
@@ -6,6 +6,7 @@ import scala.util.regexp._
 import scalaz._ ; import Scalaz._
 
 import java.lang.ClassLoader 
+
 import java.io._
 import java.util.jar._
 

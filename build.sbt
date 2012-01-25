@@ -1,5 +1,5 @@
 
-name         := "bzzloader"
+name         := "bzzT"
 
 version      := "0.0.1"
 

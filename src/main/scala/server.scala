@@ -1,4 +1,4 @@
-package xxx.desu.bzzloader
+package xxx.desu.bzzt
 
 import akka.actor._
 import akka.dispatch.{ Await, Dispatchers }
