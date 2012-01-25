@@ -22,16 +22,10 @@ case class RunThis (
 
 object RunServ {
 
-  import FaultHandlingStrategy._
+  import SupervisorStrategy._
 
-  def apply (isolating : Boolean = false) = (
-
+  def apply (isolating : Boolean = false) =
     Props ( new RunServ ( new Loaders (isolating) ) )
-
-    withFaultHandler OneForOneStrategy {
-      case _: Exception => Stop
-      case _            => Escalate
-    } )
 }
 
 class RunServ (newLoader : Loaders) extends Actor {
@@ -47,6 +41,13 @@ class RunServ (newLoader : Loaders) extends Actor {
     case cmd @ (k : String, b : Array[Byte]) =>
       context actorOf (runner) forward RunThis (newLoader, state, k, b)
   }
+
+  import SupervisorStrategy._
+
+  override val supervisorStrategy = OneForOneStrategy () {
+                                      case _ : Exception => Stop
+                                      case _             => Escalate
+                                    }
 
 //   override def preStart { println ("+ RunServ") }
 //   override def postStop { println ("- RunServ") }

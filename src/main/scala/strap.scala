@@ -1,9 +1,15 @@
 package xxx.desu.bzzloader
 
 import akka.actor._
+import akka.pattern.ask
+
 import akka.dispatch.{ Await, Dispatchers }
+
+import akka.util.Timeout
 import akka.util.duration._
+
 import com.typesafe.config.ConfigFactory
+
 
 object StandAlones {
 
@@ -43,10 +49,12 @@ object StandAlones {
 
   import java.lang.reflect.{ InvocationTargetException => ITE }
 
+  implicit val futureTimeout : Timeout = 4 seconds
+
   def runClient [A] (server: ActorRef) = {
 
     val message = mkMsg
-    val resps = 1 to 2 map (_ => server ? (message, 4 seconds))
+    val resps = 1 to 3 map ( _ => server ? message )
 
     println ("\n>> responses:")
     resps foreach {
