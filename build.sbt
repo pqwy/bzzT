@@ -16,3 +16,4 @@ libraryDependencies ++= Seq (
   , "com.typesafe.akka" % "akka-kernel" % "2.0-M3"
   )
 
+seq (distSettings : _*)

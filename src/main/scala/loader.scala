@@ -4,13 +4,14 @@ import akka.actor.ActorSystem
 import akka.kernel.Bootable
 import com.typesafe.config.ConfigFactory
 
-class BzzLoader extends Bootable {
+class BzzTLoader extends Bootable {
 
-  val cfg = ConfigFactory.load getConfig "netserve"
+//   val cfg = ConfigFactory.load getConfig "netserve"
 
   val systema =
-    Seq ( "BzzLoader"
-        ) map (ActorSystem (_, cfg))
+    Seq ( "BzzTLoader"
+//         ) map (ActorSystem (_, cfg))
+        ) map (ActorSystem (_))
 
   def startup {
     systema foreach (ServerStarter (_))
@@ -20,3 +21,4 @@ class BzzLoader extends Bootable {
     systema foreach (_ shutdown)
   }
 }
+

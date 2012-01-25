@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicReference
 
 object ServerStarter {
   def apply (system: ActorSystem) = {
-    system actorOf (RunServ ( isolating = false ))
+    system actorOf (RunServ ( isolating = false ), name = "run")
   }
 }
 

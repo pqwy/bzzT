@@ -85,7 +85,7 @@ object StandaloneServer extends App {
 object StandaloneClient extends App {
   withActorSystem ("Client", "netclient") { (system) =>
     runClient (
-      system actorFor ("akka://Servinator@127.0.0.1:2552/user/run")
+      system actorFor ("akka://BzzTLoader@127.0.0.1:2554/user/run")
     )
   }
 }
