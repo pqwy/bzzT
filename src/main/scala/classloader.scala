@@ -42,8 +42,7 @@ object JarIO { /* No Whiskey, though. */
 class Loaders (isolating : Boolean = false) {
 
   val parent : ClassLoader =
-    if (! isolating) getClass.getClassLoader
-    else ClassLoader.getSystemClassLoader
+    if (isolating) null else getClass.getClassLoader
 
   implicit def readBytes (blob: Array[Byte]) = new ByteArrayInputStream (blob)
 
@@ -55,32 +54,27 @@ class Loaders (isolating : Boolean = false) {
         = defineClass (name, blob, 0, blob.length)
 
       override def findClass (name : String)
-        = (bytecode get name map (makeClass (name, _))) | super.findClass (name)
+        = (bytecode get class2path (name) map (makeClass (name, _))) |
+            ( throw new ClassNotFoundException (name) )
 
       override def getResourceAsStream (name : String)
-        = (bytecode get name) | null
+        = bytecode get name fold (x => x, null)
 
       override def toString =
-        "MapLoader ( " + shortMods ( bytecode.keys toSeq : _* ) + " )"
+        "MapLoader ( " + shorten ( bytecode.keys toSeq : _* ) + " )"
   }
 
-  private val re = """([^.])[^.]*\.""" r 
+  private def class2path (path : String) =
+    ("""\.""".r replaceAllIn (path, "/")) + ".class"
 
-  private def shortMods (as: String*) =
-    ( as map (k => re replaceFirstIn (k, "$1.")) take 10 mkString (", ") ) +
+  private val re = """([^/])[^/]*/""" r 
+
+  private def shorten (as: String*) =
+    ( as map (k => re replaceFirstIn (k, "$1/")) take 10 mkString (", ") ) +
       (if (as.length >= 10) ", ..." else "")
 
-  private def unJar [T <% InputStream] (is : T) : Map[String, Array[Byte]] = {
-
-    val jis = new JarInputStream (is)
-
-    val (reSep, reExt) = ("/" r, """\.class$""" r)
-
-    def pathToClassName (path : String)
-      = reExt replaceFirstIn (reSep replaceAllIn (path, "."), "")
-
-    JarIO files jis map ( nd => pathToClassName (nd._1) -> nd._2 ) toMap
-  }
+  private def unJar [T <% InputStream] (is : T) =
+    JarIO files (new JarInputStream (is)) toMap
 
   def fromJar (bytezs : Array[Byte] *) = new MapLoader {
     val bytecode = (bytezs map (unJar (_)) asMA) sum
