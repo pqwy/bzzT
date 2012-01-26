@@ -13,13 +13,6 @@ object ServerStarter {
   }
 }
 
-case class RunThis (
-    newLoader : Loaders
-  , state     : AtomicReference[AnyRef]
-  , klazz     : String
-  , blob      : Array[Byte]
-)
-
 object RunServ {
 
   import SupervisorStrategy._
@@ -30,7 +23,7 @@ object RunServ {
 
 class RunServ (newLoader : Loaders) extends Actor {
 
-  val state = new AtomicReference [AnyRef] ()
+  val state = Core newDefaultState
 
   val runner = (
     Props [Runner]
@@ -42,50 +35,28 @@ class RunServ (newLoader : Loaders) extends Actor {
       context actorOf (runner) forward RunThis (newLoader, state, k, b)
   }
 
-  import SupervisorStrategy._
+  import SupervisorStrategy.{ Stop, Escalate }
 
-  override val supervisorStrategy = OneForOneStrategy () {
-                                      case _ : Exception => Stop
-                                      case _             => Escalate
-                                    }
-
-//   override def preStart { println ("+ RunServ") }
-//   override def postStop { println ("- RunServ") }
+  override val supervisorStrategy =
+    OneForOneStrategy () {
+      case _ : Exception => Stop
+      case _             => Escalate
+    }
 }
 
 class Runner extends Actor {
 
-  import Status._
+  import Status.Failure
 
   def receive = {
 
-    case rc: RunThis =>
+    case cmd: RunThis =>
 
-      lazy val run = invoke (rc)
+      lazy val run = Core run cmd fold (identity, identity)
       sender ! (try run catch { case t: Throwable => Failure (t) })
 
       context stop self
   }
 
-  val refClass = classOf[AtomicReference[_]]
-
-  def invoke (rc: RunThis) = {
-
-    val loader     = rc.newLoader fromJar rc.blob
-    val klazz      = loader loadClass rc.klazz
-
-    val (meth, param) =
-      try klazz.getMethod ("apply", refClass) -> Seq (rc.state)
-      catch { case _ : NoSuchMethodException =>
-          klazz.getMethod ("apply")           -> Seq ()
-      }
-
-    val ob         = klazz newInstance
-
-    try meth invoke (ob, param : _*) catch { case e: Throwable => e } 
-  }
-
-//   override def preStart { println ("+ Runner") }
-//   override def postStop { println ("- Runner") }
 }
 
