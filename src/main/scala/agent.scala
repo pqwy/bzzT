@@ -1,5 +1,7 @@
 package xxx.desu.bzzt
 
+import scalaz._ ; import Scalaz._
+
 import java.util.concurrent.atomic.AtomicReference
 
 
@@ -9,6 +11,7 @@ case class RunThis (
     newLoader : Loaders
   , state     : ClientState
   , klazz     : String
+  , method    : Option[String]
   , blob      : Array[Byte]
 )
 
@@ -23,12 +26,14 @@ object Core {
     val stClass    = classOf[ClientState]
     val loader     = cmd.newLoader fromJar cmd.blob
     val klazz      = loader loadClass cmd.klazz
+    val method     = cmd.method | "apply"
 
     val (meth, param) =
-      try klazz.getMethod ("apply", stClass) -> Seq (cmd.state)
+      try klazz.getMethod (method, stClass) -> Seq (cmd.state)
       catch { case _ : NoSuchMethodException =>
-          klazz.getMethod ("apply")          -> Seq ()
+          klazz.getMethod (method)          -> Seq ()
       }
+
     val ob         = klazz newInstance
 
     try Right ( meth invoke (ob, param : _*) )

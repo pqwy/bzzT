@@ -30,11 +30,6 @@ class RunServ (newLoader : Loaders) extends Actor {
     withDispatcher "akka.actor.pinning-dispatcher"
   )
 
-  def receive = {
-    case cmd @ (k : String, b : Array[Byte]) =>
-      context actorOf (runner) forward RunThis (newLoader, state, k, b)
-  }
-
   import SupervisorStrategy.{ Stop, Escalate }
 
   override val supervisorStrategy =
@@ -42,6 +37,17 @@ class RunServ (newLoader : Loaders) extends Actor {
       case _ : Exception => Stop
       case _             => Escalate
     }
+
+  def receive = decode andThen ( context actorOf (runner) forward _ )
+
+  def decode : PartialFunction [Any, RunThis] = {
+
+    case (klazz : String, blob : Array[Byte]) =>
+      RunThis ( newLoader, state, klazz, None, blob )
+
+    case (klazz : String, method : String, blob : Array[Byte]) =>
+      RunThis ( newLoader, state, klazz, Some (method), blob )
+  }
 }
 
 class Runner extends Actor {
@@ -49,14 +55,12 @@ class Runner extends Actor {
   import Status.Failure
 
   def receive = {
-
     case cmd: RunThis =>
 
       lazy val run = Core run cmd fold (identity, identity)
-      sender ! (try run catch { case t: Throwable => Failure (t) })
+      sender ! ( try run catch { case t: Throwable => Failure (t) } )
 
       context stop self
   }
-
 }
 
