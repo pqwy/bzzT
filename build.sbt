@@ -14,6 +14,7 @@ libraryDependencies ++= Seq (
   , "com.typesafe.akka" % "akka-actor"  % "2.0-M3"
   , "com.typesafe.akka" % "akka-remote" % "2.0-M3"
   , "com.typesafe.akka" % "akka-kernel" % "2.0-M3"
+  , "org.scalatest" %% "scalatest" % "1.6.1" % "test"
   )
 
 seq (distSettings : _*)
