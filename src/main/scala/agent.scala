@@ -7,11 +7,15 @@ import java.util.concurrent.atomic.AtomicReference
 
 import Core.ClientState
 
+sealed abstract class EntryPoint
+case class  EnterCls      (cls : String)                extends EntryPoint
+case class  EnterClsMeth  (cls : String, meth : String) extends EntryPoint
+case object EnterManifest                               extends EntryPoint
+
 case class RunThis (
     newLoader : Loaders
   , state     : ClientState
-  , klazz     : String
-  , method    : Option[String]
+  , entry     : EntryPoint
   , blob      : Array[Byte]
 )
 
@@ -23,18 +27,24 @@ object Core {
 
   def run (cmd : RunThis) : Either[Throwable, Any] = {
 
-    val stClass    = classOf[ClientState]
-    val loader     = cmd.newLoader fromJar cmd.blob
-    val klazz      = loader loadClass cmd.klazz
-    val method     = cmd.method | "apply"
+    val loader = cmd.newLoader fromJar cmd.blob
 
+    val (clsn, methn) = cmd entry match {
+      case EnterCls      (k)    => (k, "apply")
+      case EnterClsMeth  (k, m) => (k, m)
+      case EnterManifest        => sys error "not yet..."
+    }
+
+    val cls = loader loadClass clsn
+
+    val refClass      = classOf[ClientState]
     val (meth, param) =
-      try klazz.getMethod (method, stClass) -> Seq (cmd.state)
+      try cls.getMethod (methn, refClass) -> Seq (cmd.state)
       catch { case _ : NoSuchMethodException =>
-          klazz.getMethod (method)          -> Seq ()
+          cls.getMethod (methn)           -> Seq ()
       }
 
-    val ob         = klazz newInstance
+    val ob = cls newInstance
 
     try Right ( meth invoke (ob, param : _*) )
     catch { case e: Throwable => Left (e) } 

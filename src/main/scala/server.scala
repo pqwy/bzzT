@@ -15,8 +15,6 @@ object ServerStarter {
 
 object RunServ {
 
-  import SupervisorStrategy._
-
   def apply (isolating : Boolean = false) =
     Props ( new RunServ ( new Loaders (isolating) ) )
 }
@@ -42,11 +40,14 @@ class RunServ (newLoader : Loaders) extends Actor {
 
   def decode : PartialFunction [Any, RunThis] = {
 
-    case (klazz : String, blob : Array[Byte]) =>
-      RunThis ( newLoader, state, klazz, None, blob )
+    case (cls : String, blob : Array[Byte]) =>
+      RunThis ( newLoader, state, EnterCls (cls), blob )
 
-    case (klazz : String, method : String, blob : Array[Byte]) =>
-      RunThis ( newLoader, state, klazz, Some (method), blob )
+    case (cls : String, meth : String, blob : Array[Byte]) =>
+      RunThis ( newLoader, state, EnterClsMeth (cls, meth), blob )
+
+    case blob : Array[Byte] =>
+      RunThis ( newLoader, state, EnterManifest, blob )
   }
 }
 
