@@ -10,7 +10,8 @@ import org.scalatest.matchers.MustMatchers
 class LoaderTests extends FeatureSpec with MustMatchers {
 
   val (newJailed, newFree) =
-    ( new Loaders (isolating = true), new Loaders (isolating = false) )
+    ( new Loaders (isolation = JoinToSystem)
+    , new Loaders (isolation = JoinToInvoker) )
 
   lazy val loaderFree   = newFree fromJar scalaJar
   lazy val loaderJailed = newJailed fromJar javaJar

@@ -6,12 +6,11 @@ import com.typesafe.config.ConfigFactory
 
 class BzzTLoader extends Bootable {
 
-//   val cfg = ConfigFactory.load getConfig "netserve"
+  val cfg = ConfigFactory.load getConfig "netserve"
 
   val systema =
     Seq ( "BzzTLoader"
-//         ) map (ActorSystem (_, cfg))
-        ) map (ActorSystem (_))
+        ) map (ActorSystem (_, cfg))
 
   def startup {
     systema foreach (ServerStarter (_))

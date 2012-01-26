@@ -9,14 +9,14 @@ import java.util.concurrent.atomic.AtomicReference
 
 object ServerStarter {
   def apply (system: ActorSystem) = {
-    system actorOf (RunServ ( isolating = false ), name = "run")
+    system actorOf (RunServ ( isolation = JoinToInvoker ), name = "run")
   }
 }
 
 object RunServ {
 
-  def apply (isolating : Boolean = false) =
-    Props ( new RunServ ( new Loaders (isolating) ) )
+  def apply ( isolation : IsolationPolicy = JoinToInvoker ) =
+    Props ( new RunServ ( new Loaders ( isolation ) ) )
 }
 
 class RunServ (newLoader : Loaders) extends Actor {

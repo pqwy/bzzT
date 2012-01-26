@@ -39,10 +39,16 @@ object JarIO { /* No Whiskey, though. */
   }
 }
 
-class Loaders (isolating : Boolean = false) {
+sealed abstract class IsolationPolicy
+case object JoinToSystem  extends IsolationPolicy
+case object JoinToInvoker extends IsolationPolicy
 
-  val parent : ClassLoader =
-    if (isolating) null else getClass.getClassLoader
+class Loaders ( isolation : IsolationPolicy ) {
+
+  val parent : ClassLoader = isolation match {
+    case JoinToSystem  => null
+    case JoinToInvoker => getClass.getClassLoader
+  }
 
   implicit def readBytes (blob: Array[Byte]) = new ByteArrayInputStream (blob)
 

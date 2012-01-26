@@ -11,12 +11,12 @@ class CoreTests extends FeatureSpec with MustMatchers {
 
   val (cmdFree, cmdJailed) =
 
-    ( RunThis ( newLoader = new Loaders (isolating = false)
+    ( RunThis ( newLoader = new Loaders (isolation = JoinToInvoker)
               , state     = Core newDefaultState
               , blob      = scalaJar
               , entry     = null )
 
-    , RunThis ( newLoader = new Loaders (isolating = true )
+    , RunThis ( newLoader = new Loaders (isolation = JoinToSystem )
               , state     = Core newDefaultState
               , blob      = javaJar
               , entry     = null )
