@@ -14,8 +14,6 @@ class LoaderTests extends FeatureSpec with MustMatchers {
 
   lazy val loaderFree   = newFree fromJar scalaJar
   lazy val loaderJailed = newJailed fromJar javaJar
-
-  println (loaderJailed)
   
   feature ("classloader construction") {
     scenario ("from jar byte array") {
