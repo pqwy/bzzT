@@ -57,10 +57,10 @@ class AkkaTests extends FeatureSpec with MustMatchers {
         ) )
 
       scenario ("round-trip / explicit method") {
-        rt ( ("desu.B", "smile", scalaJar) ) must be { "happy" }
+        rt ( ("desu.B", "smile", scalaJar) ) must be ("happy")
       }
       scenario ("round-trip / apply") {
-        rt ( ("desu.B", scalaJar) ) must be { Map ("hell" -> "yeah!") }
+        rt ( ("desu.B", scalaJar) ) must be (Map ("hell" -> "yeah!"))
       }
       scenario ("round-trip / manifest") (pending)
       scenario ("inner exceptions") {

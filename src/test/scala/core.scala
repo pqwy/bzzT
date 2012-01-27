@@ -29,16 +29,16 @@ class CoreTests extends FeatureSpec with MustMatchers {
 
     scenario ("the basic setup / explicit method") {
       ( Core run cmd (cmdJailed) (EntryClsMeth ("oposum.X", "rondom"))
-          must be { Right ("hello, java") } )
+          must be (Right ("hello, java")) )
       ( Core run cmd (cmdFree  ) (EntryClsMeth ("desu.B", "rondom"))
-          must be { Right (Map ("hell" -> "yeah!")) } )
+          must be (Right (Map ("hell" -> "yeah!"))) )
     }
 
     scenario ("the basic setup / apply") {
       ( Core run cmd (cmdJailed) (EntryCls ("oposum.X"))
-          must be { Right ("hello, java") } )
+          must be (Right ("hello, java")) )
       ( Core run cmd (cmdFree  ) (EntryCls ("desu.B"))
-          must be { Right (Map ("hell" -> "yeah!")) } )
+          must be (Right (Map ("hell" -> "yeah!"))) )
     }
 
     scenario ("the basic setup / manifest") (pending)
@@ -60,19 +60,19 @@ class CoreTests extends FeatureSpec with MustMatchers {
 
     scenario ("priority of state-accepting methods") {
       ( Core run cmd (cmdFree) (EntryCls ("desu.Needy"))
-          must be { Right ('goodie) } )
+          must be (Right ('goodie)) )
     }
     scenario ("get") {
       val rn : java.lang.Double = math.random
       cmdFree.state set rn
       ( Core run cmd (cmdFree) (EntryCls ("desu.Gettie"))
-          must be { Right (rn) } )
+          must be (Right (rn)) )
     }
     scenario ("update") {
       val state1 = cmdFree.state.get
       Core run cmd (cmdFree) (EntryCls ("desu.Perky"))
       val state2 = cmdFree.state.get
-      state1 must not be { state2 }
+      state1 must not be (state2)
     }
   }
 

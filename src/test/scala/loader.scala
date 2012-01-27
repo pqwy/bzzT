@@ -37,11 +37,11 @@ class LoaderTests extends FeatureSpec with MustMatchers {
     scenario ("resource location") (pending)
     scenario ("positive resource reading") {
       val stream = loaderJailed getResourceAsStream "oposum/file.txt"
-      stream must not be { null }
-      JarIO slurp (stream) must be { Array (54, 54, 54, 10) }
+      stream must not be (null)
+      JarIO slurp (stream) must be (Array (54, 54, 54, 10))
     }
     scenario ("negative resource reading") {
-      loaderJailed getResourceAsStream "no/wai/for/this" must be { null }
+      loaderJailed getResourceAsStream "no/wai/for/this" must be (null)
     }
   }
 
