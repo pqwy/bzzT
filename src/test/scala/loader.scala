@@ -7,6 +7,7 @@ import org.scalatest.FeatureSpec
 import org.scalatest.matchers.MustMatchers
 
 
+protected [tests]
 class LoaderTests extends FeatureSpec with MustMatchers {
 
   val (newJailed, newFree) =

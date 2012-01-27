@@ -7,6 +7,7 @@ import org.scalatest.matchers.MustMatchers
 import java.lang.reflect.InvocationTargetException
 
 
+protected [tests]
 class CoreTests extends FeatureSpec with MustMatchers {
 
   val (cmdFree, cmdJailed) =

@@ -18,6 +18,7 @@ import java.lang.reflect.InvocationTargetException
 import java.lang.Thread.sleep
 
 
+protected [tests]
 class AkkaTests extends FeatureSpec with MustMatchers {
 
   def withActorSystem [A] (name : String, cfgRoot : String)
