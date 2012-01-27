@@ -21,7 +21,7 @@ class BzzTLoader extends Bootable {
   }
 }
 
-class BzzTLoaderApp extends App {
+object BzzTLoaderApp extends App {
   new BzzTLoader startup ;
   while (true)
     java.lang.Thread sleep Integer.MAX_VALUE

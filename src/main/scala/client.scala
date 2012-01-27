@@ -31,14 +31,15 @@ object Client extends App {
 
     implicit val sendTimeout = Timeout (10 seconds)
 
-    println ("* Sending to " + remote + " ...")
+    println ("\n* Sending to " + remote + " ...")
     val future = system.actorFor (remote) ? message
-    println ("* Sent. ...")
+    println ("\n* Sent. ...")
 
-    val res = Await result (future, 60 seconds)
+    val res = Await result (future, 300 seconds)
     res match {
       case ITE (e) =>
-        println ("* Loaded JAR threw exception:\n\n" + e)
+        println ("\n* Loaded JAR threw exception:\n\n" + e)
+        e.printStackTrace
       case r =>
         println (">> " + r)
     }

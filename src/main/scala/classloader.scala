@@ -37,11 +37,14 @@ object JarIO { /* No Whiskey, though. */
     ( entries (jis) filter (! _.isDirectory)
         map (e => ( e.getName -> slurp (jis, readWindow = 4096) )) )
   }
+
 }
 
 sealed abstract class IsolationPolicy
 case object JoinToSystem  extends IsolationPolicy
 case object JoinToInvoker extends IsolationPolicy
+
+import scala.collection.immutable.Map
 
 class Loaders ( isolation : IsolationPolicy ) {
 
@@ -79,11 +82,12 @@ class Loaders ( isolation : IsolationPolicy ) {
     ( as map (k => re replaceFirstIn (k, "$1/")) take 10 mkString (", ") ) +
       (if (as.length >= 10) ", ..." else "")
 
-  private def unJar [T <% InputStream] (is : T) =
+  private def jarMap [T <% InputStream] (is : T) =
     JarIO files (new JarInputStream (is)) toMap
 
   def fromJar (bytezs : Array[Byte] *) = new MapLoader {
-    val bytecode = (bytezs map (unJar (_)) asMA) sum
+    val bytecode = (bytezs map (jarMap (_)) asMA) sum
   }
+
 }
 

@@ -17,6 +17,7 @@ class A {
 
 class B extends A {
   def rondom = apply
+  def smile  = "happy"
 }
 
 class C extends A {

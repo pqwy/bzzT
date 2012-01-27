@@ -5,16 +5,14 @@ import scalaz._ ; import Scalaz._
 import java.util.concurrent.atomic.AtomicReference
 
 
-import Core.ClientState
-
 sealed abstract class EntryPoint
-case class  EnterCls      (cls : String)                extends EntryPoint
-case class  EnterClsMeth  (cls : String, meth : String) extends EntryPoint
-case object EnterManifest                               extends EntryPoint
+case class  EntryCls      (cls : String)                extends EntryPoint
+case class  EntryClsMeth  (cls : String, meth : String) extends EntryPoint
+case object EntryManifest                               extends EntryPoint
 
 case class RunThis (
     newLoader : Loaders
-  , state     : ClientState
+  , state     : Core.ClientState
   , entry     : EntryPoint
   , blob      : Array[Byte]
 )
@@ -30,9 +28,9 @@ object Core {
     val loader = cmd.newLoader fromJar cmd.blob
 
     val (clsn, methn) = cmd entry match {
-      case EnterCls      (k)    => (k, "apply")
-      case EnterClsMeth  (k, m) => (k, m)
-      case EnterManifest        => sys error "not yet..."
+      case EntryCls      (k)    => (k, "apply")
+      case EntryClsMeth  (k, m) => (k, m)
+      case EntryManifest        => sys error "not yet..."
     }
 
     val cls = loader loadClass clsn

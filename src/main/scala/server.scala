@@ -41,13 +41,13 @@ class RunServ (newLoader : Loaders) extends Actor {
   def decode : PartialFunction [Any, RunThis] = {
 
     case (cls : String, blob : Array[Byte]) =>
-      RunThis ( newLoader, state, EnterCls (cls), blob )
+      RunThis ( newLoader, state, EntryCls (cls), blob )
 
     case (cls : String, meth : String, blob : Array[Byte]) =>
-      RunThis ( newLoader, state, EnterClsMeth (cls, meth), blob )
+      RunThis ( newLoader, state, EntryClsMeth (cls, meth), blob )
 
     case blob : Array[Byte] =>
-      RunThis ( newLoader, state, EnterManifest, blob )
+      RunThis ( newLoader, state, EntryManifest, blob )
   }
 }
 

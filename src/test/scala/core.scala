@@ -27,29 +27,29 @@ class CoreTests extends FeatureSpec with MustMatchers {
   feature ("core invocations") {
 
     scenario ("the basic setup / explicit method") {
-      ( Core run cmd (cmdJailed) (EnterClsMeth ("oposum.X", "rondom"))
+      ( Core run cmd (cmdJailed) (EntryClsMeth ("oposum.X", "rondom"))
           must be { Right ("hello, java") } )
-      ( Core run cmd (cmdFree  ) (EnterClsMeth ("desu.B", "rondom"))
+      ( Core run cmd (cmdFree  ) (EntryClsMeth ("desu.B", "rondom"))
           must be { Right (Map ("hell" -> "yeah!")) } )
     }
 
     scenario ("the basic setup / apply") {
-      ( Core run cmd (cmdJailed) (EnterCls ("oposum.X"))
+      ( Core run cmd (cmdJailed) (EntryCls ("oposum.X"))
           must be { Right ("hello, java") } )
-      ( Core run cmd (cmdFree  ) (EnterCls ("desu.B"))
+      ( Core run cmd (cmdFree  ) (EntryCls ("desu.B"))
           must be { Right (Map ("hell" -> "yeah!")) } )
     }
 
     scenario ("the basic setup / manifest") (pending)
 
     scenario ("inner exceptions") {
-      Core run cmd (cmdFree) (EnterCls ("desu.C")) match {
+      Core run cmd (cmdFree) (EntryCls ("desu.C")) match {
         case Left (e: InvocationTargetException) =>
       }
     }
     scenario ("outer exceptions") {
       intercept[ClassNotFoundException] (
-        Core run cmd (cmdFree) (EnterCls ("no.no.no.no.no"))
+        Core run cmd (cmdFree) (EntryCls ("no.no.no.no.no"))
       )
     }
 
@@ -58,18 +58,18 @@ class CoreTests extends FeatureSpec with MustMatchers {
   feature ("state") {
 
     scenario ("priority of state-accepting methods") {
-      ( Core run cmd (cmdFree) (EnterCls ("desu.Needy"))
+      ( Core run cmd (cmdFree) (EntryCls ("desu.Needy"))
           must be { Right ('goodie) } )
     }
     scenario ("get") {
       val rn : java.lang.Double = math.random
       cmdFree.state set rn
-      ( Core run cmd (cmdFree) (EnterCls ("desu.Gettie"))
+      ( Core run cmd (cmdFree) (EntryCls ("desu.Gettie"))
           must be { Right (rn) } )
     }
     scenario ("update") {
       val state1 = cmdFree.state.get
-      Core run cmd (cmdFree) (EnterCls ("desu.Perky"))
+      Core run cmd (cmdFree) (EntryCls ("desu.Perky"))
       val state2 = cmdFree.state.get
       state1 must not be { state2 }
     }
