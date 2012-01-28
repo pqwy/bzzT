@@ -35,13 +35,13 @@ object Client extends App {
     val future = system.actorFor (remote) ? message
     println ("\n* Sent. ...")
 
-    val res = Await result (future, 300 seconds)
-    res match {
+    Await result (future, 300 seconds) match {
+
       case ITE (e) =>
         println ("\n* Loaded JAR threw exception:\n\n" + e)
         e.printStackTrace
-      case r =>
-        println (">> " + r)
+
+      case r => println (">> " + r)
     }
 
   } finally { system.shutdown }
