@@ -12,12 +12,12 @@ case object EntryManifest                               extends EntryPoint
 
 case class RunThis (
     newLoader : Loaders
-  , state     : Core.ClientState
+  , state     : Exec.ClientState
   , entry     : EntryPoint
   , blob      : Array[Byte]
 )
 
-object Core {
+object Exec {
 
   type ClientState = AtomicReference [AnyRef]
 

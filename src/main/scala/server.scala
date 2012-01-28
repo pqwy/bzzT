@@ -21,7 +21,7 @@ object RunServ {
 
 class RunServ (newLoader : Loaders) extends Actor {
 
-  val state = Core newDefaultState
+  val state = Exec newDefaultState
 
   val runner = (
     Props [Runner]
@@ -58,7 +58,7 @@ class Runner extends Actor {
   def receive = {
     case cmd: RunThis =>
 
-      lazy val run = Core run cmd fold (identity, identity)
+      lazy val run = Exec run cmd fold (identity, identity)
       sender ! ( try run catch { case t: Throwable => Failure (t) } )
 
       context stop self
