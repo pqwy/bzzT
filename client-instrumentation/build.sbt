@@ -18,3 +18,18 @@ libraryDependencies ++= Seq (
   // , "com.typesafe.akka" % "akka-kernel" % "2.0-M3"
   // , "org.scalatest" %% "scalatest" % "1.6.1" % "test"
   )
+
+packageConfiguration in Compile in packageBin ~= {
+    import Package._
+    (config : Configuration) => new Configuration (
+          config.sources
+        , config.jar
+        , config.options :+ ManifestAttributes (
+              "Agent-Class"             -> "xxx.desu.bzzt.client.Agent"
+            , "Premain-Class"           -> "xxx.desu.bzzt.client.Agent"
+            // , "Can-Redefine-Classes"    -> "true"
+            // , "Can-Retransform-Classes" -> "true"
+        )
+    )
+}
+
