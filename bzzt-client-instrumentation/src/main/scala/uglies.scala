@@ -32,7 +32,15 @@ object SpaceShips {
       }
   }
 
+  private def mainThread
+    = sys.allThreads filter (_.getId == 1) headOption
+
+  private def mainThread1
+    = mainThread getOrElse { sys error "Can't find main thread there, buddy." }
+
   def put (x: AnyRef, graft: Thread) { new Noah (x, graft) }
+
+  def put (x: AnyRef) { put (x, mainThread1) }
 
   def get [T: Manifest] (graft: Thread) = {
     val loader = graft.getContextClassLoader
@@ -41,6 +49,8 @@ object SpaceShips {
                .asInstanceOf[T] )
     catch { case e: Exception => None }
   }
+
+  def get [T: Manifest] = get [T] (mainThread1)
 }
 
 /* Instrument this virtual machine

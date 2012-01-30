@@ -8,19 +8,19 @@ object BzzTBuild extends Build {
       id   = "everything"
     , base = file (".")
     ) aggregate ( server
-                , packagedClient
-                , clientInstrumentation )
+                , hostedcode
+                , clientinstrumentation )
 
   lazy val server = Project (
       id   = "bzzt-server"
-    , base = file ("server")
-    ) dependsOn (packagedClient % "test->compile")
+    , base = file ("bzzt-server")
+    ) dependsOn (hostedcode % "test->compile")
 
-  lazy val packagedClient = Project (
-      id   = "client-packaged"
-    , base = file ("test-client-packaged") )
+  lazy val hostedcode = Project (
+      id   = "bzzt-example-hosted-code"
+    , base = file ("bzzt-example-hosted-code") )
 
-  lazy val clientInstrumentation = Project (
-      id   = "client-instrumentation"
-    , base = file ("client-instrumentation") )
+  lazy val clientinstrumentation = Project (
+      id   = "bzzt-client-instrumentation"
+    , base = file ("bzzt-client-instrumentation") )
 }

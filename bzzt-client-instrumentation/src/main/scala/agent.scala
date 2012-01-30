@@ -20,21 +20,13 @@ import java.lang.instrument.Instrumentation
 
 object Agent {
 
-  def premain (args: String, inst: Instrumentation) = {
-    println ("premain")
-    save (inst)
-  }
+  def premain (args: String, inst: Instrumentation) = save (inst)
 
-  def agentmain (args: String, inst: Instrumentation) = {
-    println ("agentmain")
-    save (inst)
-  }
+  def agentmain (args: String, inst: Instrumentation) = save (inst)
 
-  def save (i: Instrumentation) = SpaceShips put (i, Thread.currentThread)
+  def save (i: Instrumentation) = SpaceShips put i
 
-  def restore1 : Option[Instrumentation] =
-    ( sys.allThreads flatMap (SpaceShips.get [Instrumentation] (_))
-        headOption )
+  def restore1 : Option[Instrumentation] = SpaceShips.get [Instrumentation]
 
   def restore = restore1 orElse { GraftAgent.injectFromThisJar ; restore1 }
 }
