@@ -3,38 +3,32 @@ package xxx.desu.bzzt
 import akka.actor._
 import akka.dispatch.{ Await, Dispatchers }
 import akka.util.duration._
+import SupervisorStrategy.{ Stop, Escalate }
+import Status.Failure
 
 import java.util.concurrent.atomic.AtomicReference
 
 
 object ServerStarter {
   def apply (system: ActorSystem) = {
-    system actorOf (RunServ ( isolation = JoinToInvoker ), name = "run")
+    system actorOf ( Props [RunServ] , name = "run" )
+    system actorOf ( Props [AttachServ] , name = "attach" )
   }
 }
 
-object RunServ {
-
-  def apply ( isolation : IsolationPolicy = JoinToInvoker ) =
-    Props ( new RunServ ( new Loaders ( isolation ) ) )
+object Strat {
+  def forgetful = OneForOneStrategy () {
+    case _ : Exception => Stop
+    case _             => Escalate
+  }
 }
 
-class RunServ (newLoader : Loaders) extends Actor {
+class RunServ extends Actor {
 
-  val state = Exec newDefaultState
+  val (newLoader, state) =
+    ( new Loaders ( isolation = JoinToInvoker ), RunCore newDefaultState )
 
-  val runner = (
-    Props [Runner]
-    withDispatcher "akka.actor.pinning-dispatcher"
-  )
-
-  import SupervisorStrategy.{ Stop, Escalate }
-
-  override val supervisorStrategy =
-    OneForOneStrategy () {
-      case _ : Exception => Stop
-      case _             => Escalate
-    }
+  override val supervisorStrategy = Strat.forgetful
 
   def receive = decode andThen ( context actorOf (runner) forward _ )
 
@@ -49,19 +43,48 @@ class RunServ (newLoader : Loaders) extends Actor {
     case blob : Array[Byte] =>
       RunThis ( newLoader, state, EntryManifest, blob )
   }
+
+  val runner = ( Props ( new Actor {
+
+    def receive = {
+      case cmd: RunThis =>
+
+        lazy val run = RunCore run cmd fold (identity, identity)
+        sender ! ( try run catch { case t: Throwable => Failure (t) } )
+        context stop self
+
+    } } ) withDispatcher "akka.actor.pinning-dispatcher"
+  )
 }
 
-class Runner extends Actor {
+class AttachServ extends Actor {
 
-  import Status.Failure
+  override val supervisorStrategy = Strat.forgetful
 
   def receive = {
-    case cmd: RunThis =>
+    case (cls: String, blob: Array[Byte]) =>
 
-      lazy val run = Exec run cmd fold (identity, identity)
-      sender ! ( try run catch { case t: Throwable => Failure (t) } )
+      try {
 
-      context stop self
+        val creator = AttachCore attached AttachThis (cls, blob)
+        sender ! ( context actorOf (Props ( creator () )) )
+
+      } catch { case t: Throwable => sender ! Failure (t) }
   }
+
+
+//   def receive = {
+//     case (cls: String, blob: Array[Byte]) =>
+//       context actorOf (Props (new Runner)) forward AttachThis (cls, blob)
+//   }
+
+//   class Runner extends Actor {
+//     def receive = {
+//       case cmd: AttachThis =>
+//         sender ! ( try ( AttachCore attachNewSystem (cmd, context) )
+//                     catch { case t: Throwable => Failure (t) } )
+//         context stop self
+//     }
+//   }
 }
 

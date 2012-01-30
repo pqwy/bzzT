@@ -9,3 +9,6 @@ organization := "hr.element"
 
 scalaVersion := "2.9.1"
 
+libraryDependencies ++= Seq (
+    "com.typesafe.akka" % "akka-actor"  % "2.0-M3"
+  )
