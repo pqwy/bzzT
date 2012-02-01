@@ -23,4 +23,9 @@ object BzzTBuild extends Build {
   lazy val clientinstrumentation = Project (
       id   = "bzzt-client-instrumentation"
     , base = file ("bzzt-client-instrumentation") )
+
+  lazy val simpleclient = Project (
+      id   = "bzzt-simple-client"
+    , base = file ("bzzt-simple-client") )
+
 }
