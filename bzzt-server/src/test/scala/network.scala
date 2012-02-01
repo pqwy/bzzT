@@ -30,7 +30,7 @@ class AkkaTests extends FeatureSpec with MustMatchers {
     finally { system.shutdown ; sleep (50) }
   }
 
-  def withServer [A] (cfgRoot : String) (f : ActorRef => A)
+  def withServer [A] (cfgRoot : String) (f : Map[String, ActorRef] => A)
     = withActorSystem ("BzzTServer", cfgRoot) ((ServerStarter (_)) andThen f)
 
   def withClient [A] (cfgRoot : String) (f : ActorSystem => A)
@@ -41,7 +41,7 @@ class AkkaTests extends FeatureSpec with MustMatchers {
 
   def basicConnect (title : String)
                    (cfgClient : String, cfgServer : String)
-                   (locateServer : (ActorRef, ActorSystem) => ActorRef) {
+                   (locateServer : (Map[String, ActorRef], ActorSystem) => ActorRef) {
 
     feature (title) {
 
@@ -76,14 +76,14 @@ class AkkaTests extends FeatureSpec with MustMatchers {
   }
 
   ( basicConnect ("over in-process akka")
-                 ("localconn", "localconn")
-                 ((server, _) => server) )
+                 ("inproc", "inproc")
+                 ((server, _) => server ("run")) )
 
   ( basicConnect ("over loopback akka")
                  ("localnetclient", "localnetserve")
                  ((_, csystem) =>
                      csystem actorFor (
-                       "akka://BzzTServer@localhost:2555/user/run")
+                       "akka://BzzTServer@localhost:3001/user/run")
                  )
   )
 

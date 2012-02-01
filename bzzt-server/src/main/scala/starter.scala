@@ -2,17 +2,14 @@ package xxx.desu.bzzt
 
 import akka.actor.{ ActorSystem, Actor, Props }
 import akka.kernel.Bootable
-import com.typesafe.config.ConfigFactory
 
 /** Runner class for the Akka microkernel.
  */
 class BzzTLoader extends Bootable {
 
-  val cfg = ConfigFactory.load getConfig "netserve"
-
   lazy val systema =
     Seq ( "BzzTLoader"
-        ) map (ActorSystem (_, cfg))
+        ) map (ActorSystem (_))
 
   def startup {
     systema foreach (ServerStarter (_))

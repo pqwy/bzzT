@@ -10,10 +10,10 @@ import java.util.concurrent.atomic.AtomicReference
 
 
 object ServerStarter {
-  def apply (system: ActorSystem) = {
-    system actorOf ( Props [RunServ] , name = "run" )
-    system actorOf ( Props [AttachServ] , name = "attach" )
-  }
+  def apply (system: ActorSystem) = Map (
+      "attach" -> ( system actorOf ( Props [AttachServ] , name = "attach" ) )
+    , "run"    -> ( system actorOf ( Props [RunServ]    , name = "run"    ) )
+  )
 }
 
 object Strat {
